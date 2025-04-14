@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArcGIS Map Page</title>
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        #header {
+            height: 50px;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            line-height: 50px;
+        }
+
+        #main-container {
+            display: flex;
+            height: calc(100% - 50px);
+        }
+
+        #map-container {
+            flex: 1;
+            height: 100%;
+        }
+
+        #basemap-gallery-container {
+            width: 200px; 
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto; 
+        }
+
+        #basemap-gallery-container calcite-action {
+            margin: 5px 0; 
+        }
+    </style>
+    <!-- Load Calcite components from CDN -->
+    <script type="module" src="https://js.arcgis.com/calcite-components/3.0.3/calcite.esm.js"></script>
+
+    <!-- Load the ArcGIS Maps SDK for JavaScript from CDN -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.32/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.32/"></script>
+
+    <!-- Load Map components from CDN-->
+    <script type="module" src="https://js.arcgis.com/map-components/4.32/arcgis-map-components.esm.js"></script>
+</head>
+
+<body>
+    <div id="header">
+        <h1>ArcGIS 中国八大林业工程分布 Map</h1>
+    </div>
+    <div id="main-container">
+        <div id="map-container">
+            <!-- Map will be rendered here -->
+        </div>
+        <div id="basemap-gallery-container">
+            <!-- Basemap gallery will be added here -->
+        </div>
+    </div>
+</body>
+
+</html>
+<script>
+    require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+        "esri/widgets/BasemapGallery",
+        "esri/widgets/ScaleBar",
+        "esri/widgets/Legend",
+        "esri/widgets/Search",
+        "esri/widgets/LayerList"
+    ], function (Map, MapView, FeatureLayer, BasemapGallery, ScaleBar, Legend, Search, LayerList) {
+        const map = new Map({
+            basemap: "topo-vector" 
+        });
+
+        const view = new MapView({
+            container: "map-container",
+            map: map,
+            center: [104.1954, 35.8617], 
+            zoom: 4 
+        });
+
+        const trailheadsLayer = new FeatureLayer({
+            url: "https://www.geosceneonline.cn/server/rest/services/Hosted/中国八大林业工程分布/FeatureServer/0"
+        });
+
+        map.add(trailheadsLayer);
+
+        const basemapGallery = new BasemapGallery({
+            view: view,
+            container: "basemap-gallery-container"
+        });
+
+        const scaleBar = new ScaleBar({
+            view: view,
+            unit: "dual"
+        });
+        view.ui.add(scaleBar, {
+            position: "bottom-left"
+        });
+
+        const legend = new Legend({
+            view: view
+        });
+        view.ui.add(legend, "bottom-right");
+
+        const searchWidget = new Search({
+            view: view
+        });
+        view.ui.add(searchWidget, "top-right");
+
+        const layerList = new LayerList({
+            view: view
+        });
+        view.ui.add(layerList, "top-left");
+
+        view.when(() => {
+            console.log("Map view is ready.");
+        }).catch(error => {
+            console.error(`Error initializing map view: ${error.message}`);
+        });
+    });
+</script>
+    
